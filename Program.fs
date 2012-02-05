@@ -20,5 +20,5 @@ for i = 0 to 20 do
     let neighbors = findNeighbors 200.0 (Seq.zip (Seq.initInfinite id) points)
     let viewExtent = (float cityParameters.Extent) * 1.2
     let view = (Rectangle (-viewExtent, -viewExtent, viewExtent, viewExtent))
-    let bitmap = renderPointsMonochrome (Color.White) (Color.Black) (Size (1024, 1024)) view points
+    let bitmap = renderPointsMonochrome (Color.Black) (Color.White) (Size (1024, 1024)) view points
     bitmap.Save (String.Format ("test{0}.png", i))

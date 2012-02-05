@@ -53,7 +53,7 @@ type Rectangle =
     end
 
 /// Finds all pairs of points in the given point set that are closer than a certain distance. The order
-/// of the points in a pair is undefined.
+/// of the returned pairs, or the points in a pair is undefined.
 let findNeighbors (distance : float) (points : seq<'a * Point>) =
     let squareDistance = distance * distance
     
@@ -93,7 +93,7 @@ let findNeighbors (distance : float) (points : seq<'a * Point>) =
             for point2 in points do
                 let identifier1, position1 = point1
                 let identifier2, position2 = point2
-                if position2.X > position1.X then
+                if position1.X > position2.X || (position1.X = position2.X && position1.Y > position2.Y) then
                     if (position1 - position2).SquareLength <= squareDistance then
                         pairs.Add (identifier1, identifier2)
 
