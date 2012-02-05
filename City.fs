@@ -50,10 +50,10 @@ let generate (parameters : CityParameters) (random : Random) =
         if area < plotArea * 1.5 then
             if potential + (1.0 - relativeDistance * 2.0) * centerBias >= 0.0  then
                 accum.Add center
-        else
+        elif area > plotArea * 0.8 then
 
             // Determine road width.
-            let roadWidth = 5.0 * (area ** 0.1)
+            let roadWidth = 3.0 * (area ** 0.1)
             let roadWidth = if roadWidth > 5.0 then roadWidth else 0.0
 
             let aspect = size.X / size.Y

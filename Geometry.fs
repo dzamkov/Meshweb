@@ -1,5 +1,8 @@
 ﻿module Meshweb.Geometry
 
+open System
+open System.Collections.Generic
+
 /// A vector in two-dimensional space.
 type Vector =
     struct
@@ -17,6 +20,9 @@ type Vector =
 
         /// Gets the length of this vector.
         member this.Length = sqrt (this.X * this.X + this.Y * this.Y)
+
+        /// Gets the square of the length of this vector.
+        member this.SquareLength = this.X * this.X + this.Y * this.Y
     end
 
 /// A point in two-dimensional space.
@@ -45,3 +51,56 @@ type Rectangle =
             point.Y >= this.Min.Y && point.Y <= this.Max.Y
 
     end
+
+/// Finds all pairs of points in the given point set that are closer than a certain distance. The order
+/// of the points in a pair is undefined.
+let findNeighbors (distance : float) (points : seq<'a * Point>) =
+    let squareDistance = distance * distance
+    
+    // Gets the sector for the given point.
+    let getSector (point : Point) = (int (point.X / distance), int (point.Y / distance))
+
+    // Divide the given points into sectors.
+    let sectors = dict (points |> Seq.groupBy (snd >> getSector))
+
+    // Gets the points in the given sector.
+    let getSectorPoints sector = 
+        let mutable points = Unchecked.defaultof<seq<'a * Point>>
+        if sectors.TryGetValue (sector, &points) then points
+        else Seq.empty
+
+    // The final list of point pairs.
+    let pairs = List<'a * 'a> ()
+
+    // Finds all valid point pairs between the two given distinct collections and
+    // adds them to the pairs list.
+    let findPairs (points1 : seq<'a * Point>) (points2 : seq<'a * Point>) =
+        for point1 in points1 do
+            for point2 in points2 do
+                let identifier1, position1 = point1
+                let identifier2, position2 = point2
+                if (position1 - position2).SquareLength <= squareDistance then
+                    pairs.Add (identifier1, identifier2)
+
+    // Iterate through all sectors to find point pairs.
+    for sector in sectors do
+        let points = sector.Value
+        let sector = sector.Key
+        let sectorX, sectorY = sector
+
+        // Find internal point pairs in the sector.
+        for point1 in points do
+            for point2 in points do
+                let identifier1, position1 = point1
+                let identifier2, position2 = point2
+                if position2.X > position1.X then
+                    if (position1 - position2).SquareLength <= squareDistance then
+                        pairs.Add (identifier1, identifier2)
+
+        // Find point pairs with the neighboring sectors.
+        findPairs (getSectorPoints (sectorX + 1, sectorY)) points
+        findPairs (getSectorPoints (sectorX + 1, sectorY + 1)) points
+        findPairs (getSectorPoints (sectorX, sectorY + 1)) points
+        findPairs (getSectorPoints (sectorX - 1, sectorY + 1)) points
+
+    pairs :> seq<'a * 'a>

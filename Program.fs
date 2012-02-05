@@ -10,13 +10,15 @@ open Meshweb.Render
 
 let random = Random 1337
 let cityParameters = {
-        Extent = 14800.0<m>
+        Extent = 4800.0<m>
         PlotArea = 800.0<m^2>
-        CenterBias = 2.5
+        CenterBias = 2.0
         GroupBias = 0.02
     }
-for i = 0 to 5 do
+for i = 0 to 20 do
     let points = generate cityParameters random
+    let neighbors = findNeighbors 200.0 (Seq.zip (Seq.initInfinite id) points)
     let viewExtent = (float cityParameters.Extent) * 1.2
-    let bitmap = renderPoints (Size (2048, 2048)) (Rectangle (-viewExtent, -viewExtent, viewExtent, viewExtent)) points
+    let view = (Rectangle (-viewExtent, -viewExtent, viewExtent, viewExtent))
+    let bitmap = renderPointsMonochrome (Color.White) (Color.Black) (Size (1024, 1024)) view points
     bitmap.Save (String.Format ("test{0}.png", i))
