@@ -30,3 +30,11 @@ let createFromEdges vertices edges =
         connections.[a].Add b
         connections.[b].Add a
     Graph<'a> (connections |> Seq.map (fun kvp -> kvp.Key, kvp.Value.ToArray ()))
+
+/// Gets the average vertex degree for the given graph.
+let averageDegree (graph : Graph<'a>) =
+    let connectionMap = graph.ConnectionMap
+    let mutable total = 0
+    for kvp in connectionMap do
+        total <- total + kvp.Value.Length
+    float total / float connectionMap.Count
