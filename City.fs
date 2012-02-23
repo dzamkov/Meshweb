@@ -60,12 +60,12 @@ let generate (parameters : CityParameters) (random : Random) =
             let split = Math.Asin (random.NextDouble () * 0.5 - 0.5) / Math.PI + 0.5
             if random.NextDouble () * (1.0 + aspect) < aspect then
                 let split = zone.Min.X + size.X * split
-                generateZone accum potential (Rectangle (zone.Min.X, zone.Min.Y, split - roadWidth, zone.Max.Y))
-                generateZone accum potential (Rectangle (split + roadWidth, zone.Min.Y, zone.Max.X, zone.Max.Y))
+                generateZone accum potential (Rectangle (zone.Min.X, zone.Min.Y, split - roadWidth * 0.5, zone.Max.Y))
+                generateZone accum potential (Rectangle (split + roadWidth * 0.5, zone.Min.Y, zone.Max.X, zone.Max.Y))
             else
                 let split = zone.Min.Y + size.Y * split
-                generateZone accum potential (Rectangle (zone.Min.X, zone.Min.Y, zone.Max.X, split - roadWidth))
-                generateZone accum potential (Rectangle (zone.Min.X, split + roadWidth, zone.Max.X, zone.Max.Y))
+                generateZone accum potential (Rectangle (zone.Min.X, zone.Min.Y, zone.Max.X, split - roadWidth * 0.5))
+                generateZone accum potential (Rectangle (zone.Min.X, split + roadWidth * 0.5, zone.Max.X, zone.Max.Y))
 
     // Generate plots for the whole city.
     generateZone accum 0.0 (Rectangle (-extent, -extent, extent, extent))

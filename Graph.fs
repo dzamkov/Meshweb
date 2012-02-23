@@ -3,6 +3,8 @@
 open System
 open System.Collections.Generic
 
+open Meshweb.Util
+
 /// An undirected graph with vertices of a certain type.
 type Graph<'a when 'a : equality> (connectionMap : IDictionary<'a, 'a[]>) =
 
@@ -11,6 +13,9 @@ type Graph<'a when 'a : equality> (connectionMap : IDictionary<'a, 'a[]>) =
 
     /// Gets a collection of all vertices in this graph.
     member this.Vertices = connectionMap.Keys :> seq<'a>
+
+    /// Gets the amount of vertices in this graph.
+    member this.VerticesCount = connectionMap.Count
 
     /// Gets the neighbors for the given vertex.
     member this.GetNeighbors vertex = connectionMap.[vertex]
@@ -66,3 +71,11 @@ let islands (graph : Graph<'a>) =
         remaining.ExceptWith island.Keys |> ignore
         
     islands :> seq<Graph<'a>>
+
+/// Randomly removes vertices from the given graph based on the given pass-rate.
+let filterRandom (random : Random) rate (graph : Graph<'a>) = 
+    let newVertices = HashSet (graph.Vertices |> filterRandom random rate)
+    createFromNeighbors (
+        graph.ConnectionMap 
+        |> Seq.filter (fun kvp -> newVertices.Contains kvp.Key) 
+        |> Seq.map (fun kvp -> kvp.Key, kvp.Value |> Seq.filter newVertices.Contains |> Seq.toArray))
